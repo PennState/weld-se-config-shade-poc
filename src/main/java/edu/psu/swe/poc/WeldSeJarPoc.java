@@ -1,13 +1,34 @@
 package edu.psu.swe.poc;
 
-import javax.enterprise.event.Observes;
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 
-import org.jboss.weld.environment.se.events.ContainerInitialized;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
-public class WeldSeJarPocMain {
-  
-  public void start(@Observes ContainerInitialized event) {
-    System.out.println("Got here!");
+import lombok.extern.slf4j.Slf4j;
+
+@Dependent
+@Slf4j
+public class WeldSeJarPoc {
+
+  @Inject
+  @ConfigProperty(name = "some.string")
+  String someString;
+
+  @Inject
+  @ConfigProperty(name = "another.string")
+  String anotherString;
+
+  @Inject
+  @ConfigProperty(name = "a.third.string")
+  String aThirdString;
+
+  public void start() {
+    log.trace("start()");
+    log.debug("Configuration:");
+    log.debug("  someString: {}", someString);
+    log.debug("  anotherString: {}", anotherString);
+    log.debug("  aThirdString: {}", aThirdString);
   }
 
 }
