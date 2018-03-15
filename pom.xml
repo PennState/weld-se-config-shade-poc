@@ -8,7 +8,14 @@
   <name>Weld SE - Fat JAR Proof-of-Concept</name>
 
   <properties>
-    <weld.version>2.4.6.Final</weld.version>
+
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+
+    <microprofile-config-implementation.version>1.2.1</microprofile-config-implementation.version>
+    <slf4j.version>1.7.25</slf4j.version>
+    <weld.version>3.0.3.Final</weld.version>
+    <weld-junit5.version>1.2.1.Final</weld-junit5.version>
   </properties>
 
   <dependencyManagement>
@@ -18,6 +25,23 @@
         <artifactId>weld-se-core</artifactId>
         <version>${weld.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.wildfly</groupId>
+        <artifactId>wildfly-microprofile-config-implementation</artifactId>
+        <version>${microprofile-config-implementation.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.jboss.weld</groupId>
+        <artifactId>weld-junit5</artifactId>
+        <version>${weld-junit5.version}</version>
+        <scope>test</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -26,11 +50,53 @@
       <groupId>org.jboss.weld.se</groupId>
       <artifactId>weld-se-core</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.wildfly</groupId>
+      <artifactId>wildfly-microprofile-config-implementation</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>1.7.25</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>log4j-over-slf4j</artifactId>
+      <version>1.7.25</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
+      <version>1.7.25</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.16.20</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.weld</groupId>
+      <artifactId>weld-junit5</artifactId>
+    </dependency>
+
   </dependencies>
 
   <build>
     <plugins>
-      <plugin>
+<!--       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
           <archive>
@@ -44,13 +110,77 @@
         </configuration>
         <executions>
           <execution>
-            <id>make-assembly</id> <!-- this is used for inheritance merges -->
-            <phase>package</phase> <!-- bind to the packaging phase -->
+            <id>make-assembly</id>
+            <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>
           </execution>
         </executions>
+      </plugin>
+ -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <!-- <phase>package</phase> -->
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <!-- <minimizeJar>true</minimizeJar> -->
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <!-- <includes> -->
+                  <!-- <include>edu/psu/swe/academics/course/**</include> -->
+                  <!-- <include>javax/enterprise/context/**</include> -->
+                  <!-- <include>javax/enterprise/inject/**</include> -->
+                  <!-- <include>javax/inject/**</include> -->
+                  <!-- <include>org/jboss/logging/**</include> -->
+                  <!-- <include>org/jboss/weld/**</include> -->
+                  <!-- <include>META-INF/beans.xml</include> -->
+                  <!-- </includes> -->
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>org.jboss.weld.environment.se.StartMain</mainClass>
+                </transformer>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.19.1</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-surefire-provider</artifactId>
+            <version>1.0.1</version>
+          </dependency>
+          <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.0.1</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <includes>
+            <include>**/*Tests.java</include>
+          </includes>
+        </configuration>
       </plugin>
     </plugins>
   </build>
