@@ -3,14 +3,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>edu.psu.swe.poc</groupId>
-  <artifactId>weld-se-jar-poc</artifactId>
+  <artifactId>weld-se-config-shade-poc</artifactId>
   <version>0.1-SNAPSHOT</version>
   <name>Weld SE - Fat JAR Proof-of-Concept</name>
 
   <properties>
-
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
 
     <microprofile-config-implementation.version>1.2.1</microprofile-config-implementation.version>
     <slf4j.version>1.7.25</slf4j.version>
@@ -95,6 +97,8 @@
   </dependencies>
 
   <build>
+    <finalName>${project.artifactId}</finalName>
+
     <plugins>
 <!--       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
